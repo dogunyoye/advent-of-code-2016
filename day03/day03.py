@@ -35,7 +35,7 @@ def find_number_of_possible_triangles_reading_data_by_columns(data) -> int:
 def main() -> int:
     with open(DATA) as f:
         data = f.read()
-        print("Part 1 : " + str(find_number_of_possible_triangles(data)))
+        print("Part 1: " + str(find_number_of_possible_triangles(data)))
         print("Part 2: " + str(find_number_of_possible_triangles_reading_data_by_columns(data)))
     return 0
 
