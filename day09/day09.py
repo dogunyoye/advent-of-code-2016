@@ -16,28 +16,6 @@ def __find_marker(data, start_idx) -> tuple:
     return False, "", -1, -1
 
 
-def __length_until_first_marker(data) -> int:
-    length = 0
-    for i in range(0, len(data)):
-        if data[i] == "(":
-            return length
-        length += 1
-    return length
-
-
-def __find_children(data, start, end) -> list:
-    children = []
-    if data[start] == "(":
-        children.append(start)
-
-    for i in range(start + 1, end):
-        if i < len(data) - 1 and data[i] == ")" and data[i+1] == "(":
-            break
-        elif data[i] == "(":
-            children.append(i)
-    return children
-
-
 def calculate_decompressed_length_of_data(data) -> int:
     result = 0
     for line in data.splitlines():
@@ -57,6 +35,10 @@ def calculate_decompressed_length_of_data(data) -> int:
     return result
 
 
+def __is_marker_parent(message, idx) -> bool:
+    return message[idx] == "("
+
+
 def __traverse_compressed_data(data, idx) -> int:
     if idx == len(data):
         return 0
@@ -67,12 +49,24 @@ def __traverse_compressed_data(data, idx) -> int:
     marker = __find_marker(data, idx)
     parts = marker[1].split("x")
     seq_len, rep, rep_start = int(parts[0]), int(parts[1]), marker[3]
-    print(data[rep_start:rep_start + seq_len])
-    children = __find_children(data, rep_start, rep_start + seq_len)
+    children = []
+
+    if __is_marker_parent(data, rep_start):
+        i = idx + 1
+        while i != rep_start + seq_len:
+            m = __find_marker(data, i)
+            if not m[0] or m[2] == rep_start + seq_len:
+                break
+            if __is_marker_parent(data, m[3]):
+                parts = m[1].split("x")
+                i = m[3] + int(parts[0])
+            else:
+                i = m[3]
+            children.append(m[2])
 
     if len(children) == 0:
         # leaf
-        return rep * seq_len + __traverse_compressed_data(data, rep_start + seq_len)
+        return rep * seq_len
 
     result = 0
 
@@ -80,24 +74,29 @@ def __traverse_compressed_data(data, idx) -> int:
     for c in children:
         result += rep * __traverse_compressed_data(data, c)
 
-    return result + __traverse_compressed_data(data, rep_start + seq_len)
+    return result
 
 
 def calculate_decompressed_length_of_data_using_improved_format(data) -> int:
-    return __traverse_compressed_data(data, 0)
-
-
-def getLength(data):
-    length = i = 0
-    while i < len(data):
-        if data[i] == '(':
-            markerEnd = data.find(')', i)
-            (chars, repeat) = [int(x) for x in data[i + 1:markerEnd].split('x')]
-            length += getLength(data[markerEnd + 1:markerEnd + chars + 1]) * repeat
-            i = markerEnd + chars
-        else:
+    length, idx = 0, 0
+    message = data
+    chunks = []
+    while idx < len(message):
+        if message[idx] != "(":
             length += 1
-        i += 1
+            idx += 1
+        else:
+            marker = __find_marker(message, idx)
+            if not marker[0]:
+                break
+            parts = marker[1].split("x")
+            seq_len, rep, rep_start = int(parts[0]), int(parts[1]), marker[3]
+            chunks.append((message[marker[2]:rep_start + seq_len], rep))
+            idx = rep_start + seq_len
+
+    for c in chunks:
+        length += __traverse_compressed_data(c[0], 0)
+
     return length
 
 
@@ -106,7 +105,6 @@ def main() -> int:
         data = f.read()
         print("Part 1: " + str(calculate_decompressed_length_of_data(data)))
         print("Part 2: " + str(calculate_decompressed_length_of_data_using_improved_format(data)))
-        print(getLength(data))
     return 0
 
 
