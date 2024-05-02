@@ -4,24 +4,26 @@ import os.path
 DATA = os.path.join(os.path.dirname(__file__), 'day14.txt')
 
 
-def find_index_that_produces_64th_key(data) -> int:
+def __find_index(data, hash_gen_fn) -> int:
     salt, index = data.splitlines()[0], 0
-    pending, completed = [], []
+
+    pending: list[tuple[int, str, int]] = []
+    completed: list[int] = []
     found = set()
 
     while True:
-        candidate = hashlib.md5((salt + str(index)).encode()).hexdigest()
+        candidate = hash_gen_fn(salt, index)
         to_remove = []
 
         for i, p in enumerate(pending):
             if p[2] == index and p[0] in found:
-                completed.append(int(p[0]))  # int conversion to stop PyCharm complaining.
+                completed.append(p[0])
                 to_remove.append(i)
             elif p[1] in candidate:
                 if p[0] in found:
                     to_remove.append(i)
                 else:
-                    found.add(int(p[0]))  # int conversion to stop PyCharm complaining.
+                    found.add(p[0])
 
         if len(completed) == 64:
             return completed[63]
@@ -38,10 +40,30 @@ def find_index_that_produces_64th_key(data) -> int:
         index += 1
 
 
+def __hash_gen_part_one(salt, index) -> str:
+    return hashlib.md5((salt + str(index)).encode()).hexdigest()
+
+
+def __hash_gen_part_two(salt, index) -> str:
+    candidate = __hash_gen_part_one(salt, index)
+    for i in range(0, 2016):
+        candidate = hashlib.md5(candidate.encode()).hexdigest()
+    return candidate
+
+
+def find_index_that_produces_64th_key(data) -> int:
+    return __find_index(data, __hash_gen_part_one)
+
+
+def find_index_that_produces_64th_key_part_two(data) -> int:
+    return __find_index(data, __hash_gen_part_two)
+
+
 def main() -> int:
     with open(DATA) as f:
         data = f.read()
         print("Part 1: " + str(find_index_that_produces_64th_key(data)))
+        print("Part 2: " + str(find_index_that_produces_64th_key_part_two(data)))
     return 0
 
 
