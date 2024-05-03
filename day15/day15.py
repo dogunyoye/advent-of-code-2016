@@ -9,26 +9,28 @@ class Disc(object):
     def __init__(self, disc_id, positions, start):
         self.disc_id = disc_id
         self.positions = positions
-        self.start = positions.index(start)
+        self.start = start
 
-    def initial_steps_to_position_0(self) -> int:
-        idx = ((self.positions.index(self.start) + self.disc_id) % len(self.positions))
-        return 0 if idx == 0 else len(self.positions) - idx
+    def steps_to_position0(self) -> int:
+        idx = (self.start + self.disc_id) % self.positions
+        return 0 if idx == 0 else self.positions - idx
 
     def size(self):
-        return len(self.positions)
+        return self.positions
 
 
 def __create_discs(data) -> list:
     discs = []
     for line in data.splitlines():
         parts = re.findall(r'Disc #(\d+) has (\d+) positions; at time=0, it is at position (\d+)', line)[0]
-        discs.append(Disc(int(parts[0]), [*range(0, int(parts[1]))], int(parts[2])))
+        parts = list(map(int, parts))
+        discs.append(Disc(parts[0], parts[1], parts[2]))
     return discs
 
 
 # Modular arithmetic
 # https://en.wikipedia.org/wiki/Modular_arithmetic#Congruence
+#
 # We have to find a time (t) such that the position on each wheel
 # is 0. To do this, we need to know how many 'steps' away the starting position
 # on each wheel is away from 0 (n) with respect the size of the disk (s).
@@ -37,12 +39,12 @@ def __create_discs(data) -> list:
 # This can also be solved with the Chinese Remainder Theorem
 # https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Statement
 # https://www.geeksforgeeks.org/introduction-to-chinese-remainder-theorem/
-def __find_time(discs) -> int:
+def __find_time(discs: list[Disc]) -> int:
     time = 0
     while True:
         all_discs_at_zero = True
         for d in discs:
-            steps_to_zero = d.initial_steps_to_position_0()
+            steps_to_zero = d.steps_to_position0()
             if time % d.size() != steps_to_zero % d.size():
                 all_discs_at_zero = False
                 break
@@ -57,7 +59,7 @@ def find_time_to_press_button(data) -> int:
 
 def find_time_to_press_button_part_two(data) -> int:
     discs = __create_discs(data)
-    discs.append(Disc(len(discs) + 1, [*range(0, 11)], 0))
+    discs.append(Disc(len(discs) + 1, 11, 0))
     return __find_time(discs)
 
 
