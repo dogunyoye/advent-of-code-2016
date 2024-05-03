@@ -9,13 +9,14 @@ class Disc(object):
     def __init__(self, disc_id, positions, start):
         self.disc_id = disc_id
         self.positions = positions
-        self.pointer = positions.index(start)
+        self.start = positions.index(start)
 
-    def rotate(self):
-        self.pointer = (self.pointer + 1) % len(self.positions)
+    def initial_steps_to_position_0(self) -> int:
+        idx = ((self.positions.index(self.start) + self.disc_id) % len(self.positions))
+        return 0 if idx == 0 else len(self.positions) - idx
 
-    def position(self) -> int:
-        return self.positions[self.pointer]
+    def size(self):
+        return len(self.positions)
 
 
 def __create_discs(data) -> list:
@@ -26,31 +27,45 @@ def __create_discs(data) -> list:
     return discs
 
 
-def __all_discs_at_position_zero(discs) -> bool:
-    for d in discs:
-        if d.position() != 0:
-            return False
-    return True
+# Modular arithmetic
+# https://en.wikipedia.org/wiki/Modular_arithmetic#Congruence
+# We have to find a time (t) such that the position on each wheel
+# is 0. To do this, we need to know how many 'steps' away the starting position
+# on each wheel is away from 0 (n) with respect the size of the disk (s).
+# The equation is: t ≡ n mod s, which is the same as: t mod s = n mod s
+#
+# This can also be solved with the Chinese Remainder Theorem
+# https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Statement
+# https://www.geeksforgeeks.org/introduction-to-chinese-remainder-theorem/
+def __find_time(discs) -> int:
+    time = 0
+    while True:
+        all_discs_at_zero = True
+        for d in discs:
+            steps_to_zero = d.initial_steps_to_position_0()
+            if time % d.size() != steps_to_zero % d.size():
+                all_discs_at_zero = False
+                break
+        if all_discs_at_zero:
+            return time
+        time += 1
 
 
 def find_time_to_press_button(data) -> int:
+    return __find_time(__create_discs(data))
+
+
+def find_time_to_press_button_part_two(data) -> int:
     discs = __create_discs(data)
-    time = 0
-
-    while not __all_discs_at_position_zero(discs):
-        time += 1
-        discs = __create_discs(data)
-        for i, d in enumerate(discs):
-            for _ in range(0, time+d.disc_id):
-                d.rotate()
-
-    return time
+    discs.append(Disc(len(discs) + 1, [*range(0, 11)], 0))
+    return __find_time(discs)
 
 
 def main() -> int:
     with open(DATA) as f:
         data = f.read()
         print("Part 1: " + str(find_time_to_press_button(data)))
+        print("Part 2: " + str(find_time_to_press_button_part_two(data)))
     return 0
 
 
