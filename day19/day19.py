@@ -10,6 +10,7 @@ def get_position(current_position, size) -> int:
     return current_position + (size // 2) - 1
 
 
+# TODO optimise to use Josephus formula
 def find_position_of_elf_with_all_presents(data) -> int:
     elves = {}
     for k in range(1, int(data.splitlines()[0]) + 1):
