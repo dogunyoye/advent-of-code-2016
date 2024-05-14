@@ -22,7 +22,9 @@ class Scrambler(object):
         self.__swap_position(idx0, idx1)
 
     def __reverse(self, start, end):
-        return
+        x = list(self.password)
+        x[start:end + 1] = reversed(x[start:end + 1])
+        self.password = ''.join(x)
 
     def __rotate_steps(self, direction, steps):
         if direction == "left":
@@ -32,11 +34,17 @@ class Scrambler(object):
 
     def __move(self, letter_idx, insertion_point):
         x = list(self.password)
-        x.insert(insertion_point + 1, self.password[letter_idx])
         del x[letter_idx]
+        x.insert(insertion_point, self.password[letter_idx])
         self.password = ''.join(x)
 
     def __rotate_position(self, letter):
+        letter_idx = self.password.index(letter)
+        direction = "right"
+        if letter_idx >= 4:
+            self.__rotate_steps(direction, 2 + letter_idx)
+        else:
+            self.__rotate_steps(direction, 1 + letter_idx)
         return
 
     def scramble(self) -> str:
@@ -63,7 +71,7 @@ class Scrambler(object):
 
 
 def scramble_password(data) -> str:
-    password = "abcde"
+    password = "abcdefgh"
     scrambler = Scrambler(password, data.splitlines())
     return scrambler.scramble()
 
