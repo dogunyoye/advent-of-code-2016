@@ -80,9 +80,8 @@ def scramble_password(data) -> str:
 def unscramble_password(data) -> str:
     scrambled_password = "fbgdceah"
     operations = data.splitlines()
-    combos = list(permutations(scrambled_password, len(scrambled_password)))
-    for c in combos:
-        candidate_password = ''.join(c)
+    for p in permutations(scrambled_password):
+        candidate_password = ''.join(p)
         scrambler = Scrambler(candidate_password, operations)
         if scrambled_password == scrambler.scramble():
             return candidate_password
