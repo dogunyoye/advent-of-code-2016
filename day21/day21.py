@@ -66,7 +66,7 @@ class Scrambler(object):
                 parts = re.findall(r'move position (\d+) to position (\d+)', line)[0]
                 self.__move(int(parts[0]), int(parts[1]))
             else:
-                parts = re.findall(r'rotate (left|right) (\d+) (step|steps)', line)[0]
+                parts = re.findall(r'rotate (left|right) (\d+) step[s]*', line)[0]
                 self.__rotate_steps(parts[0], int(parts[1]))
         return self.password
 
