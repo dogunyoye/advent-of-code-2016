@@ -16,8 +16,8 @@ def __combine_ranges(data) -> list:
     ranges = sorted(ranges, key=lambda r: r[0])
 
     while True:
-        has_union = False
-        intersection, to_remove = [], []
+        has_overlap = False
+        overlap, to_remove = [], []
 
         for i in range(0, len(ranges) - 1):
             for j in range(i + 1, len(ranges)):
@@ -26,31 +26,31 @@ def __combine_ranges(data) -> list:
                 second_min, second_max = second[0], second[1]
 
                 if first_min <= second_min <= first_max <= second_max:  # right overlap
-                    intersection.append((first_min, second_max))
+                    overlap.append((first_min, second_max))
                 elif second_min <= first_min <= second_max <= first_max and first_max >= second_min:  # left overlap
-                    intersection.append((second_min, first_max))
+                    overlap.append((second_min, first_max))
                 elif first_min <= second_min <= first_max and first_min <= second_max <= first_max:  # within
-                    has_union = True
+                    has_overlap = True
                     to_remove.append(j)
                     break
 
-                if len(intersection) == 1:
-                    has_union = True
+                if len(overlap) == 1:
+                    has_overlap = True
                     to_remove.append(i)
                     to_remove.append(j)
                     break
 
-            if has_union:
+            if has_overlap:
                 break
 
         for r in to_remove[::-1]:
             del ranges[r]
 
-        if len(intersection) == 1:
-            ranges.append(intersection[0])
+        if len(overlap) == 1:
+            ranges.append(overlap[0])
 
         ranges = sorted(ranges, key=lambda x: x[0])
-        if not has_union:
+        if not has_overlap:
             break
 
     return ranges
