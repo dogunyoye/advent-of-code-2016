@@ -1,5 +1,6 @@
 import os.path
 import re
+from itertools import permutations
 
 DATA = os.path.join(os.path.dirname(__file__), 'day21.txt')
 
@@ -76,10 +77,23 @@ def scramble_password(data) -> str:
     return scrambler.scramble()
 
 
+def unscramble_password(data) -> str:
+    scrambled_password = "fbgdceah"
+    operations = data.splitlines()
+    combos = list(permutations(scrambled_password, len(scrambled_password)))
+    for c in combos:
+        candidate_password = ''.join(c)
+        scrambler = Scrambler(candidate_password, operations)
+        if scrambled_password == scrambler.scramble():
+            return candidate_password
+    raise Exception("Could not find password")
+
+
 def main() -> int:
     with open(DATA) as f:
         data = f.read()
         print("Part 1: " + scramble_password(data))
+        print("Part 2: " + unscramble_password(data))
     return 0
 
 
