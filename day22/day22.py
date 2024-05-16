@@ -7,8 +7,7 @@ DATA = os.path.join(os.path.dirname(__file__), 'day22.txt')
 class Node(object):
 
     def __init__(self, i, j, size, used, avail, used_percent):
-        self.i = i
-        self.j = j
+        self.i, self.j = i, j
         self.size = size
         self.used = used
         self.avail = avail
@@ -37,7 +36,16 @@ def __create_nodes(data) -> list[Node]:
 
 def calculate_number_of_viable_node_pairs(data) -> int:
     nodes = __create_nodes(data)
-    return 0
+    pairs = []
+    for i in range(0, len(nodes) - 1):
+        a = nodes[i]
+        for j in range(i+1, len(nodes)):
+            b = nodes[j]
+            if 0 < a.used <= b.avail:
+                pairs.append((a, b))
+            if 0 < b.used <= a.avail:
+                pairs.append((b, a))
+    return len(pairs)
 
 
 def main() -> int:
