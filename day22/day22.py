@@ -54,6 +54,9 @@ def calculate_number_of_viable_node_pairs(data) -> int:
     return len(pairs)
 
 
+# Puzzle visualised as a game here - https://codepen.io/anon/pen/BQEZzK/
+# Requires JS library, Lodash
+# on codepen.io, Settings -> Add External Scripts/Pens -> Add Lodash
 def calculate_fewest_steps_to_move_goal_node(data) -> int:
     nodes = __create_nodes(data)
 
