@@ -1,4 +1,3 @@
-import copy
 import os.path
 import re
 from collections import deque
