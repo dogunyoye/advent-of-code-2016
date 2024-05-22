@@ -5,10 +5,11 @@ DATA = os.path.join(os.path.dirname(__file__), 'day23.txt')
 
 class Computer(object):
 
-    def __init__(self, registers, program, instruction_pointer):
+    def __init__(self, registers, program, instruction_pointer, part_two):
         self.registers = registers
         self.program = program
         self.instruction_pointer = instruction_pointer
+        self.part_two = part_two
 
     @staticmethod
     def __parse_instruction(instruction) -> None | tuple:
@@ -65,10 +66,7 @@ class Computer(object):
 
     def __tgl(self, reg):
         v = self.registers[reg]
-        if v < 0:
-            pointer = self.instruction_pointer - v
-        else:
-            pointer = self.instruction_pointer + v
+        pointer = self.instruction_pointer + v
 
         if pointer >= len(self.program):
             return
@@ -93,6 +91,37 @@ class Computer(object):
             instruction = self.__parse_instruction(instruction)
 
             if instruction is not None:
+                # !DISCLAIMER!: This is hard-coded specific to my input.
+                # The general idea here is to optimise the loops in the
+                # program. Many loops are incrementing/decrementing
+                # register values by 1. This is slow and will take forever
+                # to complete. Instead, we can shortcut this by reverse
+                # engineering the program to see what condition is required
+                # for each loop to terminate, and just adding/multiplying the
+                # number iterations to each relevant register. Then, I can skip
+                # to the instruction directly after the loop and continue the
+                # program. I found 3 loops to optimise in my program. With these
+                # correctly optimised, my solution returns the correct answer instantly.
+                if self.part_two and self.instruction_pointer == 5:
+                    self.registers["a"] += self.registers["c"]
+                    self.registers["a"] *= self.registers["d"]
+                    self.registers["c"] = 0
+                    self.registers["d"] = 0
+                    self.instruction_pointer = 10
+                    continue
+
+                if self.part_two and self.instruction_pointer == 13:
+                    self.registers["c"] += self.registers["d"]
+                    self.registers["d"] = 0
+                    self.instruction_pointer = 16
+                    continue
+
+                if self.part_two and self.instruction_pointer == 21:
+                    self.registers["a"] += abs(self.registers["d"])
+                    self.registers["d"] = 0
+                    self.instruction_pointer = 24
+                    continue
+
                 instruction_type = instruction[0]
 
                 if instruction_type == "cpy":
@@ -111,7 +140,13 @@ class Computer(object):
 
 
 def find_value_for_safe(data) -> int:
-    computer = Computer({"a": 7}, data.splitlines(), 0)
+    computer = Computer({"a": 7, "b": 0, "c": 0, "d": 0}, data.splitlines(), 0, False)
+    computer.execute_program()
+    return computer.registers["a"]
+
+
+def find_real_value_for_safe(data) -> int:
+    computer = Computer({"a": 12, "b": 0, "c": 0, "d": 0}, data.splitlines(), 0, True)
     computer.execute_program()
     return computer.registers["a"]
 
@@ -120,6 +155,7 @@ def main() -> int:
     with open(DATA) as f:
         data = f.read()
         print("Part 1: " + str(find_value_for_safe(data)))
+        print("Part 2: " + str(find_real_value_for_safe(data)))
     return 0
 
 
