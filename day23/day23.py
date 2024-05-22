@@ -102,6 +102,12 @@ class Computer(object):
                 # to the instruction directly after the loop and continue the
                 # program. I found 3 loops to optimise in my program. With these
                 # correctly optimised, my solution returns the correct answer instantly.
+
+                # inc a
+                # dec c
+                # jnz c -2
+                # dec d
+                # jnz d -5
                 if self.part_two and self.instruction_pointer == 5:
                     self.registers["a"] += self.registers["c"] * self.registers["d"]
                     self.registers["c"] = 0
@@ -109,12 +115,21 @@ class Computer(object):
                     self.instruction_pointer = 10
                     continue
 
+                # dec d
+                # inc c
+                # jnz d -2
                 if self.part_two and self.instruction_pointer == 13:
                     self.registers["c"] += self.registers["d"]
                     self.registers["d"] = 0
                     self.instruction_pointer = 16
                     continue
 
+                # inc a
+                # inc d
+                # jnz d -2
+                # Note here that 'd' is being incremented to terminate
+                # the loops, which implies that it is negative. Hence
+                # why we use abs() to add on the number of iterations
                 if self.part_two and self.instruction_pointer == 21:
                     self.registers["a"] += abs(self.registers["d"])
                     self.registers["d"] = 0
