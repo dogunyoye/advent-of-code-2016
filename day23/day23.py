@@ -103,8 +103,7 @@ class Computer(object):
                 # program. I found 3 loops to optimise in my program. With these
                 # correctly optimised, my solution returns the correct answer instantly.
                 if self.part_two and self.instruction_pointer == 5:
-                    self.registers["a"] += self.registers["c"]
-                    self.registers["a"] *= self.registers["d"]
+                    self.registers["a"] += self.registers["c"] * self.registers["d"]
                     self.registers["c"] = 0
                     self.registers["d"] = 0
                     self.instruction_pointer = 10
