@@ -113,7 +113,7 @@ class Computer(object):
                 elif instruction_type == "out":
                     self.__out(instruction[1])
                     if len(self.sequence) == 10:
-                        break
+                        return
                 elif instruction_type == "jnz":
                     self.__jnz(instruction[1], instruction[2])
                     continue
