@@ -122,6 +122,8 @@ def __traverse_floors(floors, chip_to_gen) -> int:
                         seen.add(state)
                         queue.append((steps + 1, n, copied_floors))
 
+    raise Exception("No solution found!")
+
 
 def find_minimum_steps_required_to_bring_all_items_to_floor_four() -> int:
     # Example
