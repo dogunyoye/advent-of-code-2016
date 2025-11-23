@@ -128,6 +128,7 @@ def find_lowest_positive_integer_for_register_a(data) -> int:
         computer.execute_program()
         if computer.sequence == "0101010101":
             return i
+    raise Exception("No solution found!")
 
 
 def main() -> int:
